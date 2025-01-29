@@ -10,15 +10,18 @@
 ---
 
 # Required ReadMe Info for ALL MCS1653 Projects
-* **Project**   - 
-* **Your Name** - 
-* **Date**      - 
+* **Project**   - Project1-2DPlatformer
+* **Your Name** - Malachi Wheaton
+* **Date**      - 2/17/25
 
 <br>
 
 1. **What are the controls to your game? How do we play?**
 
-
+Left and Right - A and D
+Jump - Space
+Dash - Shift
+Attack - Enter
 
 <br>
 
