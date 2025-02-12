@@ -2,19 +2,22 @@ using UnityEngine;
 
 public class EnemyHealth : MonoBehaviour
 {
-    public int health = 30;
+    public int health = 3; // Enemy's starting health
 
     public void TakeDamage(int damage)
     {
         health -= damage;
+        Debug.Log($"{gameObject.name} took {damage} damage! Remaining health: {health}");
+
         if (health <= 0)
         {
             Die();
         }
     }
 
-    void Die()
+    private void Die()
     {
-        Destroy(gameObject);
+        Debug.Log($"{gameObject.name} has been defeated!");
+        Destroy(gameObject); // Remove the enemy from the scene
     }
 }

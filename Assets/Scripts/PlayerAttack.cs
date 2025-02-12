@@ -1,35 +1,48 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections;
 
 public class PlayerAttack : MonoBehaviour
 {
-    public GameObject attackHitbox;
-    public float attackDuration = 0.2F;
+    public GameObject attackUp;
+    public GameObject attackDown;
+    public GameObject attackLeft;
+    public GameObject attackRight;
 
+    public float attackDuration = 0.2f; // How long the attack lasts
     private bool isAttacking = false;
-
-    void Start()
-    {
-        attackHitbox.SetActive(false); // Disable hitbox at start
-    }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.L) && !isAttacking) // Change to your attack button
+        if (isAttacking) return;
+
+        // Check for combined input
+        if (Input.GetKey(KeyCode.W) && Input.GetKeyDown(KeyCode.Return)) // Up attack
         {
-            StartCoroutine(SwingAttack());
+            StartCoroutine(PerformAttack(attackUp));
+        }
+        else if (Input.GetKey(KeyCode.S) && Input.GetKeyDown(KeyCode.Return)) // Down attack
+        {
+            StartCoroutine(PerformAttack(attackDown));
+        }
+        else if (Input.GetKey(KeyCode.A) && Input.GetKeyDown(KeyCode.Return)) // Left attack
+        {
+            StartCoroutine(PerformAttack(attackLeft));
+        }
+        else if (Input.GetKey(KeyCode.D) && Input.GetKeyDown(KeyCode.Return)) // Right attack
+        {
+            StartCoroutine(PerformAttack(attackRight));
         }
     }
 
-    IEnumerator SwingAttack()
+    private IEnumerator PerformAttack(GameObject attackDirection)
     {
         isAttacking = true;
-        attackHitbox.SetActive(true);
-        yield return new WaitForSeconds(attackDuration);
-        attackHitbox.SetActive(false);
+        attackDirection.SetActive(true); // Enable the attack hitbox
+        yield return new WaitForSeconds(attackDuration); // Wait for the duration
+        attackDirection.SetActive(false); // Disable the attack hitbox
         isAttacking = false;
     }
-
-
 }
+
+
+
