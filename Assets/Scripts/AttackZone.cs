@@ -4,13 +4,18 @@ public class AttackZone : MonoBehaviour
 {
     public int damage = 1; // Amount of damage the attack deals
 
-    private void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Check if the object entering the hitbox is an enemy
-        EnemyHealth enemyHealth = other.GetComponent<EnemyHealth>();
-        if (enemyHealth != null)
+        if (collision.CompareTag("Enemy"))
         {
-            enemyHealth.TakeDamage(damage); // Deal damage to the enemy
+            Enemy enemy = collision.GetComponent<Enemy>();
+            if (enemy != null)
+            {
+                Vector2 knockbackDirection = (collision.transform.position - transform.position).normalized;
+                float knockbackForce = 7f; // Adjust this value for enemy knockback strength
+
+                enemy.TakeDamage(1, knockbackDirection, knockbackForce); // Send knockback data
+            }
         }
     }
 }

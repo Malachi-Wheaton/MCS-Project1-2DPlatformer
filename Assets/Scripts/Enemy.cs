@@ -40,16 +40,25 @@ public class Enemy : MonoBehaviour
         transform.position += (Vector3)direction * speed * Time.deltaTime; // Move the enemy
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage, Vector2 knockbackDirection, float knockbackForce)
     {
         health -= damage;
         Debug.Log($"{gameObject.name} took {damage} damage! Remaining health: {health}");
+
+        // Apply knockback if the enemy has a Rigidbody2D
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.velocity = Vector2.zero; // Reset current movement
+            rb.AddForce(knockbackDirection * knockbackForce, ForceMode2D.Impulse);
+        }
 
         if (health <= 0)
         {
             Die();
         }
     }
+
 
     private void Die()
     {
