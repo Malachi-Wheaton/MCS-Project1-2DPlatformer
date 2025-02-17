@@ -1,28 +1,39 @@
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using System.Collections;
 
 public class PlayerHealth : MonoBehaviour
 {
-    public int maxhealth = 10;
+    public int maxHealth = 10;
     public int health;
-    public HealthBar healthBar; // Reference to the health bar script
+    public Slider healthBar;
+    public TextMeshProUGUI healthText;
+
+    public float invincibilityDuration = 1.5f; // Time the player is invincible
+    private bool isInvincible = false;
+
+    private SpriteRenderer spriteRenderer; // For visual effect
 
     void Start()
     {
-        health = maxhealth;
-        if (healthBar != null)
-        {
-            healthBar.SetMaxHealth(maxhealth); // Initialize the health bar
-        }
+        health = maxHealth;
+        spriteRenderer = GetComponent<SpriteRenderer>(); // Get the player's sprite
+        UpdateHealthUI();
     }
 
     public void TakeDamage(int damage)
     {
-        health -= damage;
+        if (isInvincible) return; // Ignore damage if invincible
 
-        if (healthBar != null)
+        health -= damage;
+        if (health < 0)
         {
-            healthBar.SetHealth(health); // Update the health bar when taking damage
+            health = 0; // Ensure health doesn't go negative
         }
+
+        UpdateHealthUI(); // Update health bar UI
+        StartCoroutine(InvincibilityFrames()); // Start I-frames
 
         if (health <= 0)
         {
@@ -30,9 +41,42 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
+    void UpdateHealthUI()
+    {
+        if (healthBar != null)
+        {
+            healthBar.value = (float)health / maxHealth; // Set slider value between 0-1
+        }
+        if (healthText != null)
+        {
+            healthText.text = health + " / " + maxHealth; // Update text display
+        }
+    }
+
+    IEnumerator InvincibilityFrames()
+    {
+        isInvincible = true;
+        float elapsed = 0f;
+        float flashInterval = 0.2f; // Time between flashes
+
+        while (elapsed < invincibilityDuration)
+        {
+            spriteRenderer.enabled = !spriteRenderer.enabled; // Toggle visibility
+            yield return new WaitForSeconds(flashInterval);
+            elapsed += flashInterval;
+        }
+
+        spriteRenderer.enabled = true; // Ensure sprite is visible
+        isInvincible = false;
+    }
+
     void Die()
     {
-        // Add death animation, effects, or respawn logic here
-        Destroy(gameObject); // Destroy the player
+        Debug.Log("Player has died!");
+        Destroy(gameObject); // Destroy player object on death
     }
 }
+
+
+
+
