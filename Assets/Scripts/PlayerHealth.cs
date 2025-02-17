@@ -10,30 +10,33 @@ public class PlayerHealth : MonoBehaviour
     public Slider healthBar;
     public TextMeshProUGUI healthText;
 
-    public float invincibilityDuration = 1.5f; // Time the player is invincible
+    public float invincibilityDuration = 1.5f;
     private bool isInvincible = false;
 
-    private SpriteRenderer spriteRenderer; // For visual effect
+    private SpriteRenderer spriteRenderer;
+    private Rigidbody2D rb;
+    private PlayerMovement playerMovement; // Ensure you have a movement script to disable
 
     void Start()
     {
         health = maxHealth;
-        spriteRenderer = GetComponent<SpriteRenderer>(); // Get the player's sprite
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        rb = GetComponent<Rigidbody2D>();
+        playerMovement = GetComponent<PlayerMovement>();
+
         UpdateHealthUI();
     }
 
     public void TakeDamage(int damage)
     {
-        if (isInvincible) return; // Ignore damage if invincible
+        if (isInvincible) return;
 
         health -= damage;
         if (health < 0)
-        {
-            health = 0; // Ensure health doesn't go negative
-        }
+            health = 0;
 
-        UpdateHealthUI(); // Update health bar UI
-        StartCoroutine(InvincibilityFrames()); // Start I-frames
+        UpdateHealthUI();
+        StartCoroutine(InvincibilityFrames());
 
         if (health <= 0)
         {
@@ -41,15 +44,15 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
-    void UpdateHealthUI()
+    public void UpdateHealthUI()
     {
         if (healthBar != null)
         {
-            healthBar.value = (float)health / maxHealth; // Set slider value between 0-1
+            healthBar.value = (float)health / maxHealth;
         }
         if (healthText != null)
         {
-            healthText.text = health + " / " + maxHealth; // Update text display
+            healthText.text = health + " / " + maxHealth;
         }
     }
 
@@ -57,25 +60,51 @@ public class PlayerHealth : MonoBehaviour
     {
         isInvincible = true;
         float elapsed = 0f;
-        float flashInterval = 0.2f; // Time between flashes
+        float flashInterval = 0.2f;
 
         while (elapsed < invincibilityDuration)
         {
-            spriteRenderer.enabled = !spriteRenderer.enabled; // Toggle visibility
+            spriteRenderer.enabled = !spriteRenderer.enabled;
             yield return new WaitForSeconds(flashInterval);
             elapsed += flashInterval;
         }
 
-        spriteRenderer.enabled = true; // Ensure sprite is visible
+        spriteRenderer.enabled = true;
         isInvincible = false;
     }
 
     void Die()
     {
         Debug.Log("Player has died!");
-        Destroy(gameObject); // Destroy player object on death
+        GameManager.instance.RespawnPlayer(gameObject);
+    }
+
+
+    IEnumerator Respawn()
+    {
+        // Disable movement & physics
+        gameObject.SetActive(false);
+        rb.velocity = Vector2.zero;
+        if (playerMovement != null)
+            playerMovement.enabled = false;
+
+        yield return new WaitForSeconds(2f);
+
+        // Reset health
+        health = maxHealth;
+        UpdateHealthUI();
+
+        // Move player to respawn point
+        transform.position = RespawnPoint.respawnPosition;
+
+        // Reactivate player
+        gameObject.SetActive(true);
+        if (playerMovement != null)
+            playerMovement.enabled = true;
     }
 }
+
+
 
 
 
