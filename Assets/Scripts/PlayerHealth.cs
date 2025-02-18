@@ -15,7 +15,7 @@ public class PlayerHealth : MonoBehaviour
 
     private SpriteRenderer spriteRenderer;
     private Rigidbody2D rb;
-    private PlayerMovement playerMovement; // Ensure you have a movement script to disable
+    private PlayerMovement playerMovement;
 
     void Start()
     {
@@ -73,36 +73,19 @@ public class PlayerHealth : MonoBehaviour
         isInvincible = false;
     }
 
-    void Die()
-    {
+    public void Die()
+    { 
         Debug.Log("Player has died!");
-        GameManager.instance.RespawnPlayer(gameObject);
-    }
 
+        // Call the Game Over screen instead of instantly respawning
+        FindObjectOfType<GameOverManager>().ShowGameOverScreen();
 
-    IEnumerator Respawn()
-    {
-        // Disable movement & physics
+        // Disable the player object
         gameObject.SetActive(false);
-        rb.velocity = Vector2.zero;
-        if (playerMovement != null)
-            playerMovement.enabled = false;
-
-        yield return new WaitForSeconds(2f);
-
-        // Reset health
-        health = maxHealth;
-        UpdateHealthUI();
-
-        // Move player to respawn point
-        transform.position = RespawnPoint.respawnPosition;
-
-        // Reactivate player
-        gameObject.SetActive(true);
-        if (playerMovement != null)
-            playerMovement.enabled = true;
     }
 }
+
+
 
 
 
